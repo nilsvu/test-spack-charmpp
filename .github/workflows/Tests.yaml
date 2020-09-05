@@ -1,0 +1,15 @@
+
+name: Tests
+
+on: push
+
+jobs:
+  build_container:
+    name: Build Docker container
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/build-push-action@v1
+        with:
+          repository: nilsleiffischer/test-spack-charmpp
+          push: false
