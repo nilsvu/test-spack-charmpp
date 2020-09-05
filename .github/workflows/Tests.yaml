@@ -7,36 +7,61 @@ jobs:
   build_macos:
     name: Build on macOS
     runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        charm_version:
+          - develop
+          - 6.10.2
     steps:
       - name: Install Homebrew dependencies
         run: >
           brew install cmake autoconf automake
       - uses: actions/setup-python@v1
-      - name: Install Charm++ via Spack
+      - name: Install Spack
         run: |
           git clone https://github.com/spack/spack.git
           source ./spack/share/spack/setup-env.sh
           spack compiler find
           spack external find --not-buildable
-          spack install -j4 charmpp@develop
+      - name: Install Charm++
+        run: |
+          source ./spack/share/spack/setup-env.sh
+          spack install -v -j4 charmpp@${{ matrix.charm_version }}
   build_linux:
     name: Build on Linux
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        charm_version:
+          - develop
+          - 6.10.2
     steps:
       - uses: actions/setup-python@v1
-      - name: Install Charm++ via Spack
+      - name: Install Spack
         run: |
           git clone https://github.com/spack/spack.git
           source ./spack/share/spack/setup-env.sh
           spack compiler find
           spack external find --not-buildable
-          spack install -j4 charmpp@develop
+      - name: Install Charm++
+        run: |
+          source ./spack/share/spack/setup-env.sh
+          spack install -v -j4 charmpp@${{ matrix.charm_version }}
   build_container:
     name: Build Docker container
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        charm_version:
+          - develop
+          - 6.10.2
     steps:
       - uses: actions/checkout@v2
       - uses: docker/build-push-action@v1
         with:
           repository: nilsleiffischer/test-spack-charmpp
+          build_args: CHARM_VERSION=${{ matrix.charm_version }}
           push: false
