@@ -19,6 +19,18 @@ jobs:
           spack compiler find
           spack external find --not-buildable
           spack install -j4 charmpp@develop
+  build_linux:
+    name: Build on Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v1
+      - name: Install Charm++ via Spack
+        run: |
+          git clone https://github.com/spack/spack.git
+          source ./spack/share/spack/setup-env.sh
+          spack compiler find
+          spack external find --not-buildable
+          spack install -j4 charmpp@develop
   build_container:
     name: Build Docker container
     runs-on: ubuntu-latest
