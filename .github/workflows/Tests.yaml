@@ -13,21 +13,23 @@ jobs:
         charm_version:
           - develop
           - 6.10.2
+        compiler:
+          - gcc
+          - clang
     steps:
-      - name: Install Homebrew dependencies
-        run: >
-          brew install cmake autoconf automake
+      - name: Install dependencies
+        run: brew install cmake autoconf automake
       - uses: actions/setup-python@v1
       - name: Install Spack
         run: |
           git clone https://github.com/spack/spack.git
           source ./spack/share/spack/setup-env.sh
-          spack compiler find
+          spack compiler find && spack compiler info ${{ matrix.compiler }}
           spack external find --not-buildable
       - name: Install Charm++
         run: |
           source ./spack/share/spack/setup-env.sh
-          spack install -v -j4 charmpp@${{ matrix.charm_version }}
+          spack install -v -j4 charmpp@${{ matrix.charm_version }}%${{ matrix.compiler }}
   build_linux:
     name: Build on Linux
     runs-on: ubuntu-latest
@@ -37,18 +39,23 @@ jobs:
         charm_version:
           - develop
           - 6.10.2
+        compiler:
+          - gcc
+          - clang
     steps:
+      - name: Install dependencies
+        run: sudo apt-get install -y gfortran-9
       - uses: actions/setup-python@v1
       - name: Install Spack
         run: |
           git clone https://github.com/spack/spack.git
           source ./spack/share/spack/setup-env.sh
-          spack compiler find
+          spack compiler find && spack compiler info ${{ matrix.compiler }}
           spack external find --not-buildable
       - name: Install Charm++
         run: |
           source ./spack/share/spack/setup-env.sh
-          spack install -v -j4 charmpp@${{ matrix.charm_version }}
+          spack install -v -j4 charmpp@${{ matrix.charm_version }}%${{ matrix.compiler }}
   build_container:
     name: Build Docker container
     runs-on: ubuntu-latest
