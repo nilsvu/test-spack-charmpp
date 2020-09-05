@@ -16,6 +16,7 @@ jobs:
         compiler:
           - gcc
           - clang
+          - apple-clang
     steps:
       - name: Install dependencies
         run: brew install cmake autoconf automake
