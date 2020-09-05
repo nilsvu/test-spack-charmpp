@@ -4,6 +4,21 @@ name: Tests
 on: push
 
 jobs:
+  build_macos:
+    name: Build on macOS
+    runs-on: macos-latest
+    steps:
+      - name: Install Homebrew dependencies
+        run: >
+          brew install cmake autoconf automake
+      - uses: actions/setup-python@v1
+      - name: Install Charm++ via Spack
+        run: |
+          git clone https://github.com/spack/spack.git
+          source ./spack/share/spack/setup-env.sh
+          spack compiler find
+          spack external find --not-buildable
+          spack install -j4 charmpp@develop
   build_container:
     name: Build Docker container
     runs-on: ubuntu-latest
