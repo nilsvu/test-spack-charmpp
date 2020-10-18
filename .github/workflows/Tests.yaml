@@ -1,7 +1,9 @@
 
 name: Tests
 
-on: push
+on:
+  - push
+  - workflow_dispatch
 
 jobs:
   build_macos:
@@ -31,6 +33,7 @@ jobs:
         run: |
           source ./spack/share/spack/setup-env.sh
           spack install -v -j4 charmpp@${{ matrix.charm_version }}%${{ matrix.compiler }}
+
   build_linux:
     name: Build on Linux
     runs-on: ubuntu-latest
@@ -57,6 +60,7 @@ jobs:
         run: |
           source ./spack/share/spack/setup-env.sh
           spack install -v -j4 charmpp@${{ matrix.charm_version }}%${{ matrix.compiler }}
+
   build_container:
     name: Build Docker container
     runs-on: ubuntu-latest
