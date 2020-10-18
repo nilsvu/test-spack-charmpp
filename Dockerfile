@@ -4,7 +4,8 @@ ARG CHARM_VERSION=develop
 
 RUN apt-get update -y \
   && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    git curl python3 autoconf automake cmake gcc-10 g++-10 gfortran-10
+    git curl python3 autoconf automake cmake gcc-10 g++-10 gfortran-10 \
+    zlib1g-dev
 
 RUN git clone https://github.com/spack/spack \
   && ./spack/bin/spack debug report \
