@@ -51,7 +51,7 @@ jobs:
           - clang
     steps:
       - name: Install dependencies
-        run: sudo apt-get install -y gfortran-9
+        run: sudo apt-get install -y gfortran-10
       - uses: actions/setup-python@v1
       - name: Install Spack
         run: |
