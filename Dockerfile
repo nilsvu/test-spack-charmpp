@@ -1,6 +1,6 @@
 FROM ubuntu:20.04
 
-ARG CHARM_VERSION=develop
+ARG CHARM_VERSION=master
 
 RUN apt-get update -y \
   && DEBIAN_FRONTEND=noninteractive apt-get install -y \

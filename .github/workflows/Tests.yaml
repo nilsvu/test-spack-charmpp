@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         charm_version:
-          - develop
+          - master
           - 6.10.2
         compiler:
           - gcc
@@ -44,7 +44,7 @@ jobs:
       fail-fast: false
       matrix:
         charm_version:
-          - develop
+          - master
           - 6.10.2
         compiler:
           - gcc
@@ -71,7 +71,7 @@ jobs:
       fail-fast: false
       matrix:
         charm_version:
-          - develop
+          - master
           - 6.10.2
     steps:
       - uses: actions/checkout@v2
