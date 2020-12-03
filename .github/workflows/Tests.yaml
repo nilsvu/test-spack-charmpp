@@ -6,12 +6,14 @@ on:
   - workflow_dispatch
 
 jobs:
-  build_macos:
-    name: Build on macOS
-    runs-on: macos-latest
+  build_native:
+    name: Build
     strategy:
       fail-fast: false
       matrix:
+        platform:
+          - ubuntu-latest
+          - macos-latest
         charm_version:
           - master
           - 6.10.2
@@ -19,50 +21,42 @@ jobs:
           - gcc
           - clang
           - apple-clang
+        exclude:
+          - platform: ubuntu-latest
+            compiler: apple-clang
+    runs-on: ${{ matrix.platform }}
     steps:
-      - name: Install dependencies
-        run: brew install cmake autoconf automake
-      - name: Install clang
-        if: matrix.compiler == 'clang'
-        run: brew install llvm
-      - uses: actions/setup-python@v1
-      - name: Install Spack
-        run: |
-          git clone https://github.com/spack/spack.git
-          source ./spack/share/spack/setup-env.sh
-          spack compiler find && spack compiler info ${{ matrix.compiler }}
-          spack external find --not-buildable
-      - name: Install Charm++
-        run: |
-          source ./spack/share/spack/setup-env.sh
-          spack install -v -j4 charmpp@${{ matrix.charm_version }}%${{ matrix.compiler }}
-
-  build_linux:
-    name: Build on Linux
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        charm_version:
-          - master
-          - 6.10.2
-        compiler:
-          - gcc
-          - clang
-    steps:
-      - name: Install dependencies
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-latest'
         run: sudo apt-get install -y gfortran-10
-      - uses: actions/setup-python@v1
+      - name: Install macOS dependencies
+        if: matrix.platform == 'macos-latest'
+        run: brew install cmake autoconf automake
+      - uses: actions/setup-python@v2
       - name: Install Spack
         run: |
           git clone https://github.com/spack/spack.git
-          source ./spack/share/spack/setup-env.sh
-          spack compiler find && spack compiler info ${{ matrix.compiler }}
-          spack external find --not-buildable
+          spack/bin/spack compiler find
+          spack/bin/spack external find --not-buildable
+      - name: Install and find clang on macOS
+        if: matrix.platform == 'macos-latest' && matrix.compiler == 'clang'
+        run: |
+          brew install llvm gsed
+          spack/bin/spack compiler find $(brew --prefix llvm)
+          ln -s $(which gsed) /usr/local/bin/sed
+      - name: Add Fortran to clang compiler configs
+        if: matrix.compiler == 'clang'
+        run: |
+          export FC=$(which gfortran)
+          sed -i "s|f77:$|f77: $FC|" $HOME/.spack/*/compilers.yaml
+          sed -i "s|fc:$|fc: $FC|" $HOME/.spack/*/compilers.yaml
+      - name: Print compiler info
+        run: |
+          spack/bin/spack compiler info ${{ matrix.compiler }}
       - name: Install Charm++
         run: |
-          source ./spack/share/spack/setup-env.sh
-          spack install -v -j4 charmpp@${{ matrix.charm_version }}%${{ matrix.compiler }}
+          spack/bin/spack install -v -j4 \
+            charmpp@${{ matrix.charm_version }}%${{ matrix.compiler }}
 
   build_container:
     name: Build Docker container
