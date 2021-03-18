@@ -43,13 +43,13 @@ jobs:
         run: |
           brew install llvm gsed
           spack/bin/spack compiler find $(brew --prefix llvm)
-          ln -s $(which gsed) /usr/local/bin/sed
+          echo "$(brew --prefix gsed)/libexec/gnubin" >> $GITHUB_PATH
       - name: Add Fortran to clang compiler configs
         if: matrix.compiler == 'clang'
         run: |
           export FC=$(which gfortran)
-          sed -i "s|f77:$|f77: $FC|" $HOME/.spack/*/compilers.yaml
-          sed -i "s|fc:$|fc: $FC|" $HOME/.spack/*/compilers.yaml
+          sed -i "s|f77:$|f77: $FC|g" $HOME/.spack/*/compilers.yaml
+          sed -i "s|fc:$|fc: $FC|g" $HOME/.spack/*/compilers.yaml
       - name: Print compiler info
         run: |
           spack/bin/spack compiler info ${{ matrix.compiler }}
